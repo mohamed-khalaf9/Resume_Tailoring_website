@@ -4,4 +4,4 @@ from django.shortcuts import render
 
 
 def upload(request):
-    pass
+    return render(request,'resume_tailoring/welcome.html')
