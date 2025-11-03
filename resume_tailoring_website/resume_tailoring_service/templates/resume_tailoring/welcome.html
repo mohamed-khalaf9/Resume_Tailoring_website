@@ -55,4 +55,24 @@
 
     </div>
 </div>
+<!-- Processing Popup -->
+<div id="processing-popup" class="processing-popup">
+  <div class="popup-content">
+    <div class="spinner"></div>
+    <h3>Processing your resume...</h3>
+    <p>Please wait while we tailor it for your job description.</p>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.upload-form');
+    const popup = document.getElementById('processing-popup');
+
+    form.addEventListener('submit', function() {
+      // Show the popup immediately
+      popup.style.display = 'flex';
+    });
+  });
+</script>
 {% endblock %}

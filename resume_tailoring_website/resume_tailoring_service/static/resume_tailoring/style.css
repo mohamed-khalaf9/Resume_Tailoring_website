@@ -201,3 +201,56 @@ body {
     margin-top: 5px;
     padding-left: 5px;
 }
+
+/* Processing Popup */
+.processing-popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.processing-popup .popup-content {
+    background: #fff;
+    padding: 40px 60px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.4s ease;
+}
+
+.processing-popup h3 {
+    color: #004aad;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+}
+
+.processing-popup p {
+    color: #555;
+    font-size: 1rem;
+    margin-top: 0;
+}
+
+/* Spinner animation */
+.spinner {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px auto;
+    border: 6px solid #eee;
+    border-top: 6px solid #004aad;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Animations */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
