@@ -193,3 +193,11 @@ body {
 .main-container {
     flex-grow: 1;
 }
+
+.form-errors {
+    color: #D8000C; /* A nice, angry red */
+    font-weight: 600;
+    font-size: 0.9em;
+    margin-top: 5px;
+    padding-left: 5px;
+}
