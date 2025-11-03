@@ -8,8 +8,7 @@ def upload(request):
         if form.is_valid():
             job_description = form.cleaned_data['job_description']
             resume_pdf_file = form.cleaned_data['resume_pdf_file']
-            print(type(resume_pdf_file))#debugging
-            return
+            print(resume_pdf_file)#debugging
         else:
             form = UploadForm()
 
