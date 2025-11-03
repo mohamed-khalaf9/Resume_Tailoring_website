@@ -1,8 +1,7 @@
 from django import forms
 from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
-
-from resume_tailoring_website.resume_tailoring_service.utils.validations import clean_text
+from .validations import clean_text
 
 
 class UploadForm(forms.Form):
