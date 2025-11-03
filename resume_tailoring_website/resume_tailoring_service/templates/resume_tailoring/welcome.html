@@ -3,19 +3,37 @@
 {% block title %}Welcome{% endblock %}
 
 {% block content %}
-<section class="intro">
-    <h2>Welcome to Resume Tailor</h2>
-    <p>
-        Upload your resume and job description — our smart system will personalize your resume for the job you want.
-    </p>
-    <p>
-        Just two simple steps to get your tailored resume instantly!
-    </p>
 
-    <form  method="post" enctype="multipart/form-data" class="upload-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Submit">
-    </form>
-</section>
+<div class="main-container">
+
+    <div class="form-card">
+
+        <section class="intro">
+            <h2>Welcome to Resume Tailor</h2>
+            <p>
+                Upload your resume and job description — our smart system will personalize your resume for the job you want.
+            </p>
+            <p>
+                Just two simple steps to get your tailored resume instantly!
+            </p>
+        </section>
+
+        <form method="post" enctype="multipart/form-data" class="upload-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                {{ form.job_description.label_tag }}
+                {{ form.job_description }}
+            </div>
+
+            <div class="form-group">
+                {{ form.resume_pdf_file.label_tag }}
+                {{ form.resume_pdf_file }}
+            </div>
+
+            <button type="submit" class="btn-primary">Upload & Tailor Resume</button>
+        </form>
+
+    </div>
+</div>
 {% endblock %}
