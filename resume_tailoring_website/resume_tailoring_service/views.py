@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from .utils import upload_form
 from .utils.upload_form import UploadForm
 
 
@@ -14,10 +13,9 @@ def upload(request):
         else:
             form = UploadForm()
 
-
     else:
         form = UploadForm()
 
-        return render(request,'resume_tailoring/welcome.html',{'form':form})
+    return render(request,'resume_tailoring/welcome.html',{'form':form})
 
 
