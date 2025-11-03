@@ -12,9 +12,10 @@
         Just two simple steps to get your tailored resume instantly!
     </p>
 
-    <!-- The form will go here later -->
-    <div class="form-placeholder">
-        <p><em>The upload form will appear here soon.</em></p>
-    </div>
+    <form  method="post" enctype="multipart/form-data" class="upload-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Submit">
+    </form>
 </section>
 {% endblock %}
