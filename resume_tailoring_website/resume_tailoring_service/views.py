@@ -1,5 +1,8 @@
 from django.shortcuts import render
+
+from .utils.pdf_processing import extract_resume_content
 from .utils.upload_form import UploadForm
+
 
 
 def upload(request):
@@ -8,7 +11,10 @@ def upload(request):
         if form.is_valid():
             job_description = form.cleaned_data['job_description']
             resume_pdf_file = form.cleaned_data['resume_pdf_file']
-            print(resume_pdf_file)#debugging
+            all_links_details,resume_content = extract_resume_content(resume_pdf_file.read())
+            print(resume_content)
+            print(all_links_details)
+
         else:
             form = UploadForm()
 
