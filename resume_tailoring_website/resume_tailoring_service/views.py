@@ -1,8 +1,11 @@
 from django.shortcuts import render
 
+
 from .utils.LLM_integration import tailor_resume
 from .utils.pdf_processing import extract_resume_content
+from .utils.resume_content_pydantic_models import ResumeContent
 from .utils.upload_form import UploadForm
+
 
 
 
@@ -17,9 +20,13 @@ def upload(request):
             print(resume_content)
             print("HyperLinkks############################################")
             print(all_links_details)
-            tailored_resume_content = tailor_resume(resume_content,all_links_details,job_description)
+            resume: ResumeContent = tailor_resume(resume_content,all_links_details,job_description)
             print("Tailored Resume Content############################################")
-            print(tailored_resume_content)
+            for item in resume:
+                print("--------------------------------------------------------------------------------------")
+                print(item)
+
+
 
         else:
             form = UploadForm()
