@@ -16,3 +16,13 @@ class PersonalInfo(BaseModel):
     accounts: Optional[List[Account]] = Field(None)
 
 
+class EducationItem(BaseModel):
+    university_name: Optional[str] = Field(None)
+    degree: Optional[str] = Field(None)
+    specialization: Optional[str] = Field(None)
+    faculty: Optional[str] = Field(None)
+    country: Optional[str] = Field(None)
+    city: Optional[str] = Field(None)
+    start_date: Optional[str] = Field(None)
+    end_date: Optional[str] = Field(None)
+    related_coursework: Optional[Optional[List[str]]] = Field(None)
