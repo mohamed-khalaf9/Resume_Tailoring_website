@@ -36,3 +36,18 @@ class ExperienceItem(BaseModel):
     work_type: Optional[str] = Field(None)
     location: Optional[str] = Field(None)
     description: Optional[Optional[List[str]]] = Field(None)
+
+
+class ProjectLink(BaseModel):
+    description: Optional[str] = Field(None)
+    link: Optional[str] = Field(None)
+
+
+class ProjectItem(BaseModel):
+    name: Optional[str] = Field(None)
+    links: Optional[List[ProjectLink]] = Field(None)
+    start_date: Optional[str] = Field(None)
+    end_date: Optional[str] = Field(None)
+    description: Optional[Optional[List[str]]] = Field(None)
+
+
