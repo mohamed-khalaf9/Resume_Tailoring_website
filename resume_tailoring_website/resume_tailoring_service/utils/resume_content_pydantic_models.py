@@ -26,3 +26,13 @@ class EducationItem(BaseModel):
     start_date: Optional[str] = Field(None)
     end_date: Optional[str] = Field(None)
     related_coursework: Optional[Optional[List[str]]] = Field(None)
+
+
+class ExperienceItem(BaseModel):
+    title: Optional[str] = Field(None)
+    company_name: Optional[str] = Field(None)
+    start_date: Optional[str] = Field(None)
+    end_date: Optional[str] = Field(None)
+    work_type: Optional[str] = Field(None)
+    location: Optional[str] = Field(None)
+    description: Optional[Optional[List[str]]] = Field(None)
