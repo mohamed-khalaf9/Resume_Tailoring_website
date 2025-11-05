@@ -13,7 +13,7 @@ class PersonalInfo(BaseModel):
     city: Optional[str] = Field(None)
     mobile_number: Optional[str] = Field(None)
     email: Optional[str] = Field(None)
-    accounts: Optional[List[Account]] = Field(None)
+    accounts: Optional[List[Optional[Account]]] = Field(None)
 
 
 class EducationItem(BaseModel):
@@ -25,7 +25,7 @@ class EducationItem(BaseModel):
     city: Optional[str] = Field(None)
     start_date: Optional[str] = Field(None)
     end_date: Optional[str] = Field(None)
-    related_coursework: Optional[Optional[List[str]]] = Field(None)
+    related_coursework: Optional[List[Optional[str]]] = Field(None)
 
 
 class ExperienceItem(BaseModel):
@@ -45,15 +45,15 @@ class ProjectLink(BaseModel):
 
 class ProjectItem(BaseModel):
     name: Optional[str] = Field(None)
-    links: Optional[List[ProjectLink]] = Field(None)
+    links: Optional[List[Optional[ProjectLink]]] = Field(None)
     start_date: Optional[str] = Field(None)
     end_date: Optional[str] = Field(None)
-    description: Optional[Optional[List[str]]] = Field(None)
+    description: Optional[List[Optional[str]]] = Field(None)
 
 
 class SkillGroup(BaseModel):
     group_name: Optional[str] = Field(None)
-    skills: Optional[List[str]] = Field(None)
+    skills: Optional[List[Optional[str]]] = Field(None)
 
 
 class AdditionalSectionItem(BaseModel):
@@ -61,13 +61,22 @@ class AdditionalSectionItem(BaseModel):
     start_date: Optional[str] = Field(None)
     end_date: Optional[str] = Field(None)
     link: Optional[str] = Field(None)
-    description: Optional[Optional[List[str]]] = Field(None)
+    description: Optional[List[Optional[str]]] = Field(None)
 
 
 class AdditionalSection(BaseModel):
     section_title: Optional[str] = Field(None)
-    items: Optional[List[AdditionalSectionItem]] = Field(None)
+    items: Optional[List[Optional[AdditionalSectionItem]]] = Field(None)
 
+
+
+class ResumeContent(BaseModel):
+    personal_info: Optional[PersonalInfo] = Field(None)
+    education: Optional[List[Optional[EducationItem]]] = Field(None)
+    experience: Optional[List[Optional[ExperienceItem]]] = Field(None)
+    projects: Optional[List[Optional[ProjectItem]]] = Field(None)
+    skills: Optional[List[Optional[SkillGroup]]] = Field(None)
+    additional_sections: Optional[List[Optional[AdditionalSection]]] = Field(None)
 
 
 
