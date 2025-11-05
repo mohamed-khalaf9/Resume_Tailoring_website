@@ -56,4 +56,19 @@ class SkillGroup(BaseModel):
     skills: Optional[List[str]] = Field(None)
 
 
+class AdditionalSectionItem(BaseModel):
+    name: Optional[str] = Field(None)
+    start_date: Optional[str] = Field(None)
+    end_date: Optional[str] = Field(None)
+    link: Optional[str] = Field(None)
+    description: Optional[Optional[List[str]]] = Field(None)
+
+
+class AdditionalSection(BaseModel):
+    section_title: Optional[str] = Field(None)
+    items: Optional[List[AdditionalSectionItem]] = Field(None)
+
+
+
+
 
