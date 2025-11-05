@@ -15,7 +15,6 @@ def extract_resume_content(resume_pdf_file):
                 "text": None,
                 "hyperlink": None,
                 "type": None,
-                "details": link,
             }
             # extract URI
             uri = link.get("uri")
