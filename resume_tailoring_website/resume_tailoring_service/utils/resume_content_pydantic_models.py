@@ -51,3 +51,9 @@ class ProjectItem(BaseModel):
     description: Optional[Optional[List[str]]] = Field(None)
 
 
+class SkillGroup(BaseModel):
+    group_name: Optional[str] = Field(None)
+    skills: Optional[List[str]] = Field(None)
+
+
+
