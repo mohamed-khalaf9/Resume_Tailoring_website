@@ -1,82 +1,82 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List
+
 
 
 class Account(BaseModel):
-    platform: Optional[str] = Field(None)
-    link: Optional[str] = Field(None)
+    platform: str = ""
+    link: str =""
 
 class PersonalInfo(BaseModel):
-    name: Optional[str] = Field(None)
-    job_required_title: Optional[str] = Field(None)
-    country: Optional[str] = Field(None)
-    city: Optional[str] = Field(None)
-    mobile_number: Optional[str] = Field(None)
-    email: Optional[str] = Field(None)
-    accounts: Optional[List[Optional[Account]]] = Field(None)
+    name: str= ""
+    job_required_title: str=""
+    country: str=""
+    city: str=""
+    mobile_number: str=""
+    email: str=""
+    accounts: list[Account]=Field(default_factory=list)
 
 
 class EducationItem(BaseModel):
-    university_name: Optional[str] = Field(None)
-    degree: Optional[str] = Field(None)
-    specialization: Optional[str] = Field(None)
-    faculty: Optional[str] = Field(None)
-    country: Optional[str] = Field(None)
-    city: Optional[str] = Field(None)
-    start_date: Optional[str] = Field(None)
-    end_date: Optional[str] = Field(None)
-    related_coursework: Optional[List[Optional[str]]] = Field(None)
+    university_name: str=""
+    degree: str=""
+    specialization: str=""
+    faculty: str=""
+    country: str=""
+    city: str=""
+    start_date: str=""
+    end_date: str=""
+    related_coursework: list[str]=Field(default_factory=list)
 
 
 class ExperienceItem(BaseModel):
-    title: Optional[str] = Field(None)
-    company_name: Optional[str] = Field(None)
-    start_date: Optional[str] = Field(None)
-    end_date: Optional[str] = Field(None)
-    work_type: Optional[str] = Field(None)
-    location: Optional[str] = Field(None)
-    description: Optional[List[Optional[str]]] = Field(None)
+    title: str=""
+    company_name: str=""
+    start_date: str=""
+    end_date: str=""
+    work_type: str=""
+    location: str=""
+    description: list[str]= Field(default_factory=list)
 
 
 class ProjectLink(BaseModel):
-    description: Optional[str] = Field(None)
-    link: Optional[str] = Field(None)
+    description: str=""
+    link: str=""
 
 
 class ProjectItem(BaseModel):
-    name: Optional[str] = Field(None)
-    links: Optional[List[Optional[ProjectLink]]] = Field(None)
-    start_date: Optional[str] = Field(None)
-    end_date: Optional[str] = Field(None)
-    description: Optional[List[Optional[str]]] = Field(None)
+    name: str=""
+    links: list[ProjectLink]= Field(default_factory=list)
+    start_date: str=""
+    end_date: str=""
+    description: str=""
 
 
 class SkillGroup(BaseModel):
-    group_name: Optional[str] = Field(None)
-    skills: Optional[List[Optional[str]]] = Field(None)
+    group_name: str=""
+    skills: list[str]= Field(default_factory=list)
 
 
 class AdditionalSectionItem(BaseModel):
-    name: Optional[str] = Field(None)
-    start_date: Optional[str] = Field(None)
-    end_date: Optional[str] = Field(None)
-    link: Optional[str] = Field(None)
-    description: Optional[List[Optional[str]]] = Field(None)
+    name: str=""
+    start_date: str=""
+    end_date: str=""
+    link: str=""
+    description: list[str]= Field(default_factory=list)
 
 
 class AdditionalSection(BaseModel):
-    section_title: Optional[str] = Field(None)
-    items: Optional[List[Optional[AdditionalSectionItem]]] = Field(None)
+    section_title: str=""
+    items: list[AdditionalSectionItem]= Field(default_factory=list)
 
 
 
 class ResumeContent(BaseModel):
-    personal_info: Optional[PersonalInfo] = Field(None)
-    education: Optional[List[Optional[EducationItem]]] = Field(None)
-    experience: Optional[List[Optional[ExperienceItem]]] = Field(None)
-    projects: Optional[List[Optional[ProjectItem]]] = Field(None)
-    skills: Optional[List[Optional[SkillGroup]]] = Field(None)
-    additional_sections: Optional[List[Optional[AdditionalSection]]] = Field(None)
+    personal_info: PersonalInfo=Field(default_factory=PersonalInfo)
+    education: list[EducationItem]=Field(default_factory=list)
+    experience: list[ExperienceItem]=Field(default_factory=list)
+    projects: list[ProjectItem]=Field(default_factory=list)
+    skills: list[SkillGroup]=Field(default_factory=list)
+    additional_sections: list[AdditionalSection]=Field(default_factory=list)
 
 
 
