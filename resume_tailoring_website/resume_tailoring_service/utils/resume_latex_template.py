@@ -215,9 +215,53 @@ def build_resume(resume: ResumeContent):
  \end{itemize}
 {% endif %}
     
+%-----------ADDITIONAL SECTIONS-----------
+{% if additional_sections %}
+{% for additional_section in additional_sections %}
+  {% if additional_section.section_title %}
+
+    \section{ {{ additional_section.section_title | upper }} } 
+      \resumeSubHeadingListStart
+      
+    {% for item in additional_section.items %}
+      {% if item.name %} 
     
-    
-    
+        \resumeProjectHeading
+          {
+            \textbf{ {{ item.name }} }
+      
+            {% if item.link %}
+              $|$ 
+              \href{ {{ item.link }} }{\underline{Link}} 
+            {% endif %}
+          }
+          
+          {
+            {%- if item.start_date and item.end_date -%}
+              {{ item.start_date }} -- {{ item.end_date }}
+            {%- elif item.start_date -%}
+              {{ item.start_date }} -- Present
+            {%- else -%}
+              {{ item.end_date }}
+            {%- endif -%}
+          }
+           
+        {% if item.description %}   
+          \resumeItemListStart
+          {% for bullet in item.description %}
+            \resumeItem{ {{ bullet | safe }} }
+          {% endfor %}
+          \resumeItemListEnd
+        {% endif%}
+          
+      {% endif %} 
+    {% endfor %}
+      \resumeSubHeadingListEnd
+      
+  {% endif %} 
+{% endfor %} 
+{% endif %} 
+
     
     
     
