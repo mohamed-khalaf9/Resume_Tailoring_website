@@ -86,7 +86,7 @@ def build_resume(resume: ResumeContent):
       { {%- if education_item.start_date and education_item.end_date -%}
           {{ education_item.start_date }} -- {{ education_item.end_date }}
         {%- elif education_item.start_date -%}
-          {{ education_item.start_date }}
+          {{ education_item.start_date }} -- Present
         {%- else -%}
           {{ education_item.end_date }}
         {%- endif -%} 
@@ -100,6 +100,48 @@ def build_resume(resume: ResumeContent):
 
 {% endfor %}
  \resumeSubHeadingListEnd
+{% endif %}
+
+
+{% if experience %}
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+  
+{% for experience_item in experience %}
+    \resumeSubheading
+      { {%- if experience_item.title -%}
+          {{ experience_item.title }}
+        {%- endif -%} 
+      }
+      { {%- if experience_item.start_date and experience_item.end_date -%}
+          {{ experience_item.start_date }} -- {{ experience_item.end_date }}
+        {%- elif experience_item.start_date -%}
+          {{ experience_item.start_date }} -- Present
+        {%- else -%}
+          {{ experience_item.end_date }}
+        {%- endif -%} 
+      }
+      { {%- if experience_item.company_name -%}
+          {{ experience_item.company_name }}
+        {%- endif -%} 
+      }
+      { {%- if experience_item.location -%}
+          {{ experience_item.location }}
+        {%- endif -%} 
+      }
+    % This part was already correct in your template!
+    {% if experience_item.description %}
+      \resumeItemListStart
+    {% for bullet in experience_item.description %}
+        \resumeItem{ {{ bullet }} }
+    {% endfor %}
+      \resumeItemListEnd
+    {% endif %}
+
+{% endfor %}
+
+  \resumeSubHeadingListEnd
 {% endif %}
 
 
