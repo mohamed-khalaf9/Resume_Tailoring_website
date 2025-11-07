@@ -48,7 +48,7 @@ class ProjectItem(BaseModel):
     links: list[ProjectLink]= Field(default_factory=list)
     start_date: str=""
     end_date: str=""
-    description: str=""
+    description: list[str]= Field(default_factory=list)
 
 
 class SkillGroup(BaseModel):
