@@ -190,7 +190,30 @@ def build_resume(resume: ResumeContent):
   \resumeSubHeadingListEnd
 {% endif %}
 
+%-----------SKILLS-----------
+{% if skills %}
+\section{Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+ 
+    \small{
+    \item{
+{% for skill in skills %}
+  {% if skill.group_name %}
+     \textbf
+     {
+     {{ skill.group_name }}
+     }
+     {: 
+     {{ skill.skills | join(", ") }}
+     } 
+     {% if not loop.last %} \\ {% endif %}
+  {% endif %}
+{% endfor %}
+    }}  
+    \noindent
 
+ \end{itemize}
+{% endif %}
     
     
     
