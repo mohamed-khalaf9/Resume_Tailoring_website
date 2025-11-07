@@ -145,8 +145,52 @@ def build_resume(resume: ResumeContent):
 {% endif %}
 
 
-    
-    
+%-----------PROJECTS-----------
+{% if projects %}
+\section{Projects}
+  \resumeSubHeadingListStart
+  
+{% for project in projects %}
+  {% if project.name %} 
+
+    \resumeProjectHeading
+      {
+        \textbf{ {{ project.name }} }
+  
+        {% if project.links %}
+          $|$ 
+          
+          {% for link in project.links %}
+            \href{ {{ link.link }} }{\underline{ {{ link.description }} }}
+            {% if not loop.last %} $|$ {% endif %}
+          {% endfor %}
+        {% endif %}
+      }
+      
+      {
+        {%- if project.start_date and project.end_date -%}
+          {{ project.start_date }} -- {{ project.end_date }}
+        {%- elif project.start_date -%}
+          {{ project.start_date }}
+        {%- else -%}
+          {{ project.end_date }}
+        {%- endif -%}
+      }
+       
+    {% if project.description %}   
+      \resumeItemListStart
+      {% for bullet in project.description %}
+        \resumeItem{ {{ bullet | safe }} }
+      {% endfor %}
+      \resumeItemListEnd
+    {% endif%}
+      
+  {% endif %}
+{% endfor %}
+  \resumeSubHeadingListEnd
+{% endif %}
+
+
     
     
     
