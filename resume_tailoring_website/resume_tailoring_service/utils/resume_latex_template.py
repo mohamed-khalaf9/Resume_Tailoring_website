@@ -103,16 +103,15 @@ def build_resume(resume: ResumeContent):
 %-------------------------------------------
 %%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    
+{% if personal_info.name %}   
 \begin{document}
 
 %-----------PERSONAL INFORMATION-----------  
 
-\begin{center}
 
-{% if personal_info.name %}
-    \textbf{\Huge \scshape {{ personal_info.name }} } \\ \vspace{1pt}
-{% endif%}
+\begin{center}
+   \textbf{\Huge \scshape {{ personal_info.name }} } \\ \vspace{1pt}
+
 
 {% if personal_info.mobile_number %}
     \small {{ personal_info.mobile_number }} $|$ 
@@ -141,6 +140,9 @@ def build_resume(resume: ResumeContent):
 {% endif %}
 \end{center}
 
+
+ 
+
 %-----------EDUCATION-----------
 
 
@@ -148,6 +150,7 @@ def build_resume(resume: ResumeContent):
 \section{Education}
 \resumeSubHeadingListStart
 {% for education_item in education %}
+{% if education_item.university_name %}
     \resumeSubheading
       { {% if education_item.university_name %}
           {{ education_item.university_name }} University
@@ -195,8 +198,9 @@ def build_resume(resume: ResumeContent):
         \resumeItem{\textbf{Related Coursework:} {{ education_item.related_coursework | join(", ") }} }
       \resumeItemListEnd
     {% endif %}
-
+{% endif %}
 {% endfor %}
+
  \resumeSubHeadingListEnd
 {% endif %}
 
@@ -207,11 +211,10 @@ def build_resume(resume: ResumeContent):
   \resumeSubHeadingListStart
   
 {% for experience_item in experience %}
+
+{%- if experience_item.title and experience_item.company_name -%}
     \resumeSubheading
-      { {%- if experience_item.title -%}
-          {{ experience_item.title }}
-        {%- endif -%} 
-      }
+         { {{ experience_item.title }} }
       { {%- if experience_item.start_date and experience_item.end_date -%}
           {{ experience_item.start_date }} -- {{ experience_item.end_date }}
         {%- elif experience_item.start_date -%}
@@ -228,7 +231,6 @@ def build_resume(resume: ResumeContent):
           {{ experience_item.location }}
         {%- endif -%} 
       }
-    % This part was already correct in your template!
     {% if experience_item.description %}
       \resumeItemListStart
     {% for bullet in experience_item.description %}
@@ -236,7 +238,7 @@ def build_resume(resume: ResumeContent):
     {% endfor %}
       \resumeItemListEnd
     {% endif %}
-
+{% endif %}
 {% endfor %}
 
   \resumeSubHeadingListEnd
@@ -361,6 +363,7 @@ def build_resume(resume: ResumeContent):
 {% endif %} 
 
 \end{document}
+{% endif %}
     
     
     """
