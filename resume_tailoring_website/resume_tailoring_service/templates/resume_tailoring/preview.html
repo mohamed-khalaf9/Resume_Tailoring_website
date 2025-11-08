@@ -9,7 +9,9 @@
         Here’s a preview of your optimized resume based on the job description you uploaded.
     </p>
     <div class="resume-preview-box">
-        <p><em>Generated resume preview will appear here.</em></p>
+        <embed src="{% url 'serve_pdf_preview' %}" type="application/pdf" width="100%" height="800px" />
     </div>
+
+    <a href="{% url 'serve_pdf_download' %}" class="btn-download">Download PDF</a>
 </section>
 {% endblock %}
