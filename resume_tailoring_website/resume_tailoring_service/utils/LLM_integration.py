@@ -213,8 +213,19 @@ def sanitize_for_latex(text: str) -> str:
 
     return text
 
+def sanitize_model_data(data):
 
-
+    if isinstance(data, dict):
+        # Recurse into a dict
+        return {k: sanitize_model_data(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        # Recurse into a list
+        return [sanitize_model_data(item) for item in data]
+    elif isinstance(data, str):
+        #  sanitization
+        return sanitize_for_latex(data)
+    else:
+        return data
 
 def tailor_resume(resume_content: str, hyperlinks:list, job_description:str):
     raw_text = None
