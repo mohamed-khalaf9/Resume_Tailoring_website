@@ -10,6 +10,7 @@ from .utils.resume_content_pydantic_models import ResumeContent
 from .utils.upload_form import UploadForm
 from .utils.resume_latex_template import *
 from django.core.cache import cache
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 
 
@@ -33,6 +34,7 @@ def upload(request):
             resume_latex = build_resume(resume)
             pdf_resume_bytes = compile_latex_to_pdf(resume_latex)
 
+
             if pdf_resume_bytes:
                 cache_key = f'pdf_{request.session.session_key}'
                 cache.set(cache_key,pdf_resume_bytes,timeout=6000)
@@ -49,6 +51,7 @@ def upload(request):
 def preview(request):
     return render(request,'resume_tailoring/preview.html')
 
+@xframe_options_sameorigin
 def pdf_preview(request):
     cache_key = f'pdf_{request.session.session_key}'
     resume_bytes = cache.get(cache_key)
