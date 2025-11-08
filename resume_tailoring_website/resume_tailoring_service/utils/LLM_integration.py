@@ -88,10 +88,7 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
     You MUST return **ONLY** the raw JSON object, and nothing else. No introductions, no "Here is the JSON...". The output must be a single, valid JSON that strictly adheres to the schema provided below.
 
     **CRITICAL: LaTeX-Safe String Values**
-    All string *values* within the JSON output **must** be sanitized for a LaTeX template.
-    * Replace all underscore characters (`_`) with an escaped underscore (`\_`).
-    * Remove or rephrase text to avoid special LaTeX characters like `&`, `%`, `$`, `#`, `{{`, `}}`.
-    * Remove or replace single quotes (`'`) and double quotes (`"`) from within strings to prevent compilation errors. For example, rewrite "O'Brien" as "OBrien".
+    * Remove or replace single quotes (`'`) and double quotes (`"`) from within strings to prevent compilation errors. For example, rewrite "O'Brien" as "OBrien or rewrite the entire pullet point to give same meaning without single or double quotes".
 
     **SCHEMA:**
     ```json
@@ -185,12 +182,15 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
 
 
 def sanitize_for_latex(text: str) -> str:
-
     if not isinstance(text, str):
         return text
 
+    # 1. Remove single and double quotes, [double check]
+    text = text.replace("'", "").replace('"', '')
+
 
     replacements = {
+        "\\": "\\textasciibackslash{}",  # Escape backslashes first
         "%": "\\%",
         "$": "\\$",
         "&": "\\&",
@@ -200,32 +200,32 @@ def sanitize_for_latex(text: str) -> str:
         "}": "\\}",
         "~": "\\textasciitilde{}",
         "^": "\\textasciicircum{}",
-        "\\": "\\textbackslash{}",
+        ">": "$>$",
+        "<": "$<$",
+        "'": "\\textquotesingle{}",  # [NEW] Escapes single quote
+        '"': "\\textquotedbl{}",
     }
 
-
-    text = text.replace("'", "").replace('"', '')
-
+    # Loop and replace all special characters
     for char, escaped_char in replacements.items():
-        # Avoid double-escaping if LLM already did it
-        if escaped_char not in text:
-            text = text.replace(char, escaped_char)
+        text = text.replace(char, escaped_char)
 
     return text
 
-def sanitize_llm_structred_data(data):
+def sanitize_llm_structured_data(data):
 
     if isinstance(data, dict):
         # Recurse into a dict
-        return {k: sanitize_llm_structred_data(v) for k, v in data.items()}
+        return {k: sanitize_llm_structured_data(v) for k, v in data.items()}
     elif isinstance(data, list):
         # Recurse into a list
-        return [sanitize_llm_structred_data(item) for item in data]
+        return [sanitize_llm_structured_data(item) for item in data]
     elif isinstance(data, str):
         #  sanitization
         return sanitize_for_latex(data)
     else:
         return data
+
 
 def tailor_resume(resume_content: str, hyperlinks:list, job_description:str):
     raw_text = None
@@ -265,7 +265,7 @@ def tailor_resume(resume_content: str, hyperlinks:list, job_description:str):
             return None
 
         json_response = json.loads(cleaned_text)
-        sanitized_response = sanitize_llm_structred_data(json_response)
+        sanitized_response = sanitize_llm_structured_data(json_response)
         pydantic_resume = ResumeContent.model_validate(sanitized_response)
 
         return pydantic_resume
