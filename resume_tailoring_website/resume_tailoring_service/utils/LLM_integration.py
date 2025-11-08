@@ -61,6 +61,7 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
             * **Example 2:** If text is "Bachelor of Science", you MUST set: `degree: "Bachelor"`, `faculty: "Science"`.
             * **Example 3:** If text is "Bachelor, Computer Science", you MUST set: `degree: "Bachelor"`, `specialization: "Computer Science"`.
             * Always try to split the degree level (Bachelor, Master) from the faculty (Science, Arts, Engineering) and the specialization (Computer Science, Information Technology).
+        * **NEW RULE (Work Type):** For each item in `experience`, if the resume text mentions the nature of the employment, populate the `work_type` field. Examples include "Full-time", "Part-time", "Hybrid", "Remote", or "Internship". If not mentioned, leave it as an empty string.
 
     2.  **Tailor (No Hallucination):** Analyze the `JOB DESCRIPTION`. Identify key skills, technologies, and responsibilities.
         * **CRITICAL:** You must *only* use information, skills, and experiences found in the original `RESUME TEXT`.
@@ -130,7 +131,7 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
           "company_name": "string | "" ",
           "start_date": "string | "" ",
           "end_date": "string | "" ",
-          "work_type": "string | "" ",
+          "work_type": "string | "" ", 
           "location": "string | "" ",
           "description": [
             "string | "" "
