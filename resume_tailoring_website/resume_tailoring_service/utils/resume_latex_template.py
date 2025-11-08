@@ -1,6 +1,9 @@
+import json
+
 from jinja2 import Template
 
 from .resume_content_pydantic_models import *
+import requests
 
 
 
@@ -402,6 +405,55 @@ def build_resume(resume: ResumeContent):
     return resume_latex
 
 
+def compile_latex_to_pdf(resume_latex: str) -> bytes | None:
+    API_URI = "https://latex.ytotech.com/builds/sync"
+
+    payload = {
+        "compiler": "pdflatex",
+        "resources": [
+            {
+                "main": True,
+                "content": resume_latex,
+            }
+        ]
+    }
+
+    print("--- [API] Sending LaTeX to compilation service... ---")
+
+    try:
+        response = requests.post(API_URI, json=payload, timeout=30)
+        response.raise_for_status()
+        if response.headers.get("content-type") == "application/pdf":
+            print("--- [API] PDF compilation succeeded... ---")
+            return response.content
+        else:
+            print("--- [API] PDF compilation failed... ---")
+            try:
+                print(json.dumps(response.json(),indent=2))
+            except requests.exceptions.JSONDecodeError:
+                print("--- [API] PDF compilation failed... ---")
+                print(response.text)
+            return None
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"--- [HTTP ERROR] An error occurred: {http_err} ---")
+        print(f"Response body: {response.text}")
+    except requests.exceptions.Timeout:
+        print("--- [REQUEST ERROR] The request timed out. ---")
+    except requests.exceptions.RequestException as err:
+        print(f"--- [REQUEST ERROR] An error occurred: {err} ---")
+
+    return None
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -421,3 +473,15 @@ if __name__ == "__main__":
     print("\n\n--- [SUCCESS] GENERATED LATEX OUTPUT: ---")
     print(final_latex_output)
     print("--- [END] END OF GENERATED LATEX ---")
+
+
+    pdf_bytes = compile_latex_to_pdf(final_latex_output)
+
+    # 3. Save the resulting PDF to a file
+    if pdf_bytes:
+        output_filename = "generated_resume.pdf"
+        with open(output_filename, "wb") as f:
+            f.write(pdf_bytes)
+        print(f"\n--- [SUCCESS] PDF saved as {output_filename} ---")
+    else:
+        print("\n--- [FAIL] PDF generation failed. See error log above. ---")
