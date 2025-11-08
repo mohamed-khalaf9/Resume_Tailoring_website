@@ -12,6 +12,6 @@
         <embed src="{% url 'serve_pdf_preview' %}" type="application/pdf" width="100%" height="800px" />
     </div>
 
-    <a href="{% url 'serve_pdf_download' %}" class="btn-download">Download PDF</a>
+    <a href="{% url 'serve_pdf_download' file_name=file_name %}" class="btn-download">Download PDF</a>
 </section>
 {% endblock %}

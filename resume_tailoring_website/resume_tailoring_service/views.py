@@ -22,6 +22,7 @@ def upload(request):
             job_description = form.cleaned_data['job_description']
             resume_pdf_file = form.cleaned_data['resume_pdf_file']
             all_links_details,resume_content = extract_resume_content(resume_pdf_file.read())
+
             print("Resume Content########################################")
             print(resume_content)
             print("HyperLinkks############################################")
@@ -31,25 +32,35 @@ def upload(request):
             for item in resume:
                 print("--------------------------------------------------------------------------------------")
                 print(item)
+
             resume_latex = build_resume(resume)
             pdf_resume_bytes = compile_latex_to_pdf(resume_latex)
-
 
             if pdf_resume_bytes:
                 cache_key = f'pdf_{request.session.session_key}'
                 cache.set(cache_key,pdf_resume_bytes,timeout=6000)
+                file_name_parts=[]
+                if resume.personal_info.name:
+                    name_part = "_".join(resume.personal_info.name.split())
+                    file_name_parts.append(name_part)
+                    if resume.personal_info.job_required_title:
+                        title_part = "_".join(resume.personal_info.job_required_title.split())
+                        file_name_parts.append(title_part)
+                file_name = "_".join(file_name_parts)
 
-                return redirect("preview")
+                if not file_name:
+                    file_name = "Tailored_Resume"
+
+                return redirect("preview",file_name=file_name)
             else:
                 form.add_error(None, "There was an error generating pdf")
-
 
     form = UploadForm()
     return render(request,'resume_tailoring/welcome.html',{'form':form})
 
 
-def preview(request):
-    return render(request,'resume_tailoring/preview.html')
+def preview(request,file_name):
+    return render(request,'resume_tailoring/preview.html',{'file_name':file_name})
 
 @xframe_options_sameorigin
 def pdf_preview(request):
@@ -63,14 +74,14 @@ def pdf_preview(request):
         return HttpResponse("There was an error generating pdf or session expired",status=404)
 
 
-def pdf_download(request):
+def pdf_download(request, file_name):
     cache_key = f'pdf_{request.session.session_key}'
     resume_bytes = cache.get(cache_key)
 
     if resume_bytes:
         resume_pdf_file = io.BytesIO(resume_bytes)
         response = HttpResponse(resume_pdf_file, content_type="application/pdf")
-        response['Content-Disposition'] = f'attachment; filename="tailored_resume.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="{file_name}.pdf"'
         return response
     else:
         return HttpResponse("There was an error generating pdf or session expired")
