@@ -4,5 +4,6 @@ from .views import *
 urlpatterns = [
     path('tailor', upload, name='tailor'),
     path('preview', preview, name='preview'),
+    path('preview/pdf', pdf_preview, name="serve_pdf_preview"),
 
 ]
