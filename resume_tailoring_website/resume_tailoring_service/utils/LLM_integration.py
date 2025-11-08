@@ -213,14 +213,14 @@ def sanitize_for_latex(text: str) -> str:
 
     return text
 
-def sanitize_model_data(data):
+def sanitize_llm_structred_data(data):
 
     if isinstance(data, dict):
         # Recurse into a dict
-        return {k: sanitize_model_data(v) for k, v in data.items()}
+        return {k: sanitize_llm_structred_data(v) for k, v in data.items()}
     elif isinstance(data, list):
         # Recurse into a list
-        return [sanitize_model_data(item) for item in data]
+        return [sanitize_llm_structred_data(item) for item in data]
     elif isinstance(data, str):
         #  sanitization
         return sanitize_for_latex(data)
@@ -265,7 +265,8 @@ def tailor_resume(resume_content: str, hyperlinks:list, job_description:str):
             return None
 
         json_response = json.loads(cleaned_text)
-        pydantic_resume = ResumeContent.model_validate(json_response)
+        sanitized_response = sanitize_llm_structred_data(json_response)
+        pydantic_resume = ResumeContent.model_validate(sanitized_response)
 
         return pydantic_resume
 
