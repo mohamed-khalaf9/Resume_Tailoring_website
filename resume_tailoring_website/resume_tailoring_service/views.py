@@ -37,3 +37,5 @@ def upload(request):
     return render(request,'resume_tailoring/welcome.html',{'form':form})
 
 
+def preview(request):
+    return render(request,'resume_tailoring/preview.html')
