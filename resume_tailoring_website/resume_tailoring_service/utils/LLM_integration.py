@@ -11,18 +11,6 @@ from .resume_content_pydantic_models import *
 
 
 def construct_prompt(resume_content: str, hyper_links: list, job_description: str) -> str:
-    """
-    Constructs the prompt for the Gemini API with detailed instructions
-    for parsing, tailoring, and rewriting a resume.
-
-    Args:
-        resume_content: The full unstructured text of the resume.
-        hyper_links: A list of dicts containing hyperlink data.
-        job_description: The full text of the target job description.
-
-    Returns:
-        A formatted prompt string.
-    """
 
     # Serialize the list of hyperlink objects into a JSON string.
     hyper_links_str = json.dumps(hyper_links)
@@ -64,7 +52,10 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
 
     **GUIDING PRINCIPLE:** Your primary goal is **accuracy and truthfulness**. You are a parser and a *light* copy-editor, not a creative writer. Do not add *any* information, numbers, or metrics not explicitly present in the `RESUME TEXT`. It is **better to have a simple, truthful bullet point** than an exaggerated, impact-oriented one that is a lie.
 
-    1.  **Parse and Populate:** Read the `RESUME TEXT` and fill the JSON schema. Use the `HYPERLINK DATA` to correctly populate all link-related fields (e.g., `personal_info.accounts`, `projects.links`, `additional_sections.items.link`).
+    1.  **Parse and Populate:** Read the `RESUME TEXT` and fill the JSON schema.
+        * **`personal_info.accounts`:** Use the `HYPERLINK DATA` to find social/professional links. The `platform` should be the common name (e.g., "LinkedIn", "GitHub"). The `link` is the full URL.
+        * **`projects.links`:** Use the `HYPERLINK DATA`. The `link` is the full URL. For the `description`, use the hyperlink's anchor text (e.g., "GitHub Repo", "Live Demo"). If no anchor text is available, use a logical default like "Source Code" or "Project Link".
+        * **`additional_sections.items.link`:** Use the `HYPERLINK DATA` if a relevant link is found for an item (e.g., a certificate).
         * **NEW RULE (Education):** Be granular and intelligent when parsing education.
             * **Example 1:** If text is "Bachelor of Science in Information Technology", you MUST set: `degree: "Bachelor"`, `faculty: "Science"`, `specialization: "Information Technology"`.
             * **Example 2:** If text is "Bachelor of Science", you MUST set: `degree: "Bachelor"`, `faculty: "Science"`.
@@ -82,10 +73,12 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
         * **CRITICAL CAVEAT:** If the original bullet point is a simple responsibility (e.g., "Wrote APIs," "Managed databases") and **no impact or metric [Y] is mentioned**, **DO NOT INVENT ONE.** Simply transfer the cleaned-up responsibility (e.g., "Developed and maintained REST APIs for backend services.")
         * **NEW RULE (Be Intelligent):** Do not be a robot. If a bullet point is *already* well-written and clear, you do not need to forcibly rewrite it. Only apply the X-Y-Z format if it genuinely adds value *and* all parts (X, Y, Z) are present.
 
-    4.  **Skills Grouping:** In the `skills` section, intelligently group all skills from the resume. Create meaningful `group_name` values (e.g., "Backend", "AI/ML", "Cloud & DevOps", "Databases").
-        * **NEW RULE (Skill Generality):** Extract skills at a reasonable level of generality. For example, if a project mentions 'trie-based autocomplete', the extracted skill should be 'Algorithms' or 'Data Structures', **not** the hyper-specific 'Trie-based algorithms'. Use your judgment to list skills the candidate likely possesses *based on the evidence*, without being overly restrictive.
+    4.  **Skills Grouping:** In the `skills` section, intelligently group all skills from the resume. Create meaningful `group_name` values (e.g., "Backend", "AI/ML", "Cloud & DevOps", "Databases", "Languages"(like english arabic and so on)).
+        * **NEW RULE (Skill Tailoring):**
+            1.  **Extract:** Identify all skills from the `RESUME TEXT`. Extract both the specific technology (e.g., "trie-based autocomplete") and the general concept it implies (e.g., "Data Structures", "Algorithms").
+            2.  **Align & Report:** In the final `skills` JSON, prioritize listing the skills that are **both** supported by the resume and **explicitly mentioned** in the `JOB DESCRIPTION`. If the job description asks for "Data Structures," list that. If it *specifically* asks for "Trie algorithms," list that (since the resume provides evidence for it).
 
-    5.  **Job Title:** Populate the `personal_info.job_required_title` field using the main job title from the `JOB DESCRIPTION`.
+    5.  **Job Title:** Populate the `personal_info.job_required_title` field using the main job title found in the `JOB DESCRIPTION`. Do not use a title from the resume or guess a general one.
 
     ---
     ### 3. OUTPUT FORMAT
@@ -93,93 +86,98 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
 
     You MUST return **ONLY** the raw JSON object, and nothing else. No introductions, no "Here is the JSON...". The output must be a single, valid JSON that strictly adheres to the schema provided below.
 
+    **CRITICAL: LaTeX-Safe String Values**
+    All string *values* within the JSON output **must** be sanitized for a LaTeX template.
+    * Replace all underscore characters (`_`) with an escaped underscore (`\_`).
+    * Remove or rephrase text to avoid special LaTeX characters like `&`, `%`, `$`, `#`, `{{`, `}}`.
+    * Remove or replace single quotes (`'`) and double quotes (`"`) from within strings to prevent compilation errors. For example, rewrite "O'Brien" as "OBrien".
+
     **SCHEMA:**
     ```json
     {{
       "personal_info": {{
-        "name": "string | null",
-        "job_required_title": "string | null",
-        "country": "string | null",
-        "city": "string | null",
-        "mobile_number": "string | null",
-        "email": "string | null",
+        "name": "string | "" ",
+        "job_required_title": "string | "" ",
+        "country": "string | "" ",
+        "city": "string | "" ",
+        "mobile_number": "string | "" ",
+        "email": "string | "" ",
         "accounts": [
           {{
             "platform": "string | null",
             "link": "string | null"
-          }} | null
-        ] | null
-      }} | null,
+          }}
+        ] | []
+      }},
       "education": [
         {{
-          "university_name": "string | null",
-          "degree": "string | null",
-          "specialization": "string | null",
-          "faculty": "string | null",
-          "country": "string | null",
-          "city": "string | null",
-          "start_date": "string | null",
-          "end_date": "string | null",
+          "university_name": "string | "" ",
+          "degree": "string | "" ",
+          "specialization": "string | "" ",
+          "faculty": "string | "" ",
+          "country": "string | "" ",
+          "city": "string | "" ",
+          "start_date": "string | "" ",
+          "end_date": "string | "" ",
           "related_coursework": [
-            "string | null"
-          ] | null
-        }} | null
-      ] | null,
+            "string | "" "
+          ] | []
+        }}
+      ] | [],
       "experience": [
         {{
-          "title": "string | null",
-          "company_name": "string | null",
-          "start_date": "string | null",
-          "end_date": "string | null",
-          "work_type": "string | null",
-          "location": "string | null",
+          "title": "string | "" ",
+          "company_name": "string | "" ",
+          "start_date": "string | "" ",
+          "end_date": "string | "" ",
+          "work_type": "string | "" ",
+          "location": "string | "" ",
           "description": [
-            "string | null"
-          ] | null
-        }} | null
-      ] | null,
+            "string | "" "
+          ] | []
+        }}
+      ] | [],
       "projects": [
         {{
-          "name": "string | null",
+          "name": "string | "" ",
           "links": [
             {{
-              "description": "string | null",
-              "link": "string |null"
-            }} | null
-          ] | null,
-          "start_date": "string | null",
-          "end_date": "string | null",
+              "description": "string | "" ",
+              "link": "string | "" "
+            }}
+          ] | [],
+          "start_date": "string | "" ",
+          "end_date": "string | "" ",
           "description": [
-            "string | null"
-          ] | null
-        }} | null
-      ] | null,
+            "string | "" "
+          ] | []
+        }}
+      ] | [],
       "skills": [
         {{
-          "group_name": "string | null",
+          "group_name": "string | "" ",
           "skills": [
-            "string | null"
-          ] | null
-        }} | null
-      ] | null,
+            "string | "" "
+          ] | []
+        }}
+      ] | [],
       "additional_sections": [
         {{
-          "section_title": "string | null",
+          "section_title": "string | "" ",
           "items": [
             {{
-              "name": "string | null",
-              "start_date": "string | null",
-              "end_date": "string | null",
-              "link": "string | null",
+              "name": "string | "" ",
+              "start_date": "string | "" ",
+              "end_date": "string | "" ",
+              "link": "string | "" ",
               "description": [
-                "string | null"
-              ] | null
-            }} | null
-          ] | null
-        }} | null
-      ] | null
+                "string | "" "
+              ] | []
+            }}
+          ] | []
+        }}
+      ] | []
     }}
-    ```
     """)
 
     return prompt
