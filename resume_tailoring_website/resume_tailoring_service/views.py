@@ -1,3 +1,6 @@
+import io
+
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 
@@ -45,3 +48,16 @@ def upload(request):
 
 def preview(request):
     return render(request,'resume_tailoring/preview.html')
+
+def pdf_preview(request):
+    cache_key = f'pdf_{request.session.session_key}'
+    resume_bytes = cache.get(cache_key)
+
+    if resume_bytes:
+        resume_pdf_file = io.BytesIO(resume_bytes)
+        return HttpResponse(resume_pdf_file, content_type="application/pdf")
+    else:
+        return HttpResponse("There was an error generating pdf or session expired",status=404)
+
+
+
