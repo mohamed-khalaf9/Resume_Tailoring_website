@@ -184,6 +184,36 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
     return prompt
 
 
+def sanitize_for_latex(text: str) -> str:
+
+    if not isinstance(text, str):
+        return text
+
+
+    replacements = {
+        "%": "\\%",
+        "$": "\\$",
+        "&": "\\&",
+        "_": "\\_",
+        "#": "\\#",
+        "{": "\\{",
+        "}": "\\}",
+        "~": "\\textasciitilde{}",
+        "^": "\\textasciicircum{}",
+        "\\": "\\textbackslash{}",
+    }
+
+
+    text = text.replace("'", "").replace('"', '')
+
+    for char, escaped_char in replacements.items():
+        # Avoid double-escaping if LLM already did it
+        if escaped_char not in text:
+            text = text.replace(char, escaped_char)
+
+    return text
+
+
 
 
 def tailor_resume(resume_content: str, hyperlinks:list, job_description:str):
