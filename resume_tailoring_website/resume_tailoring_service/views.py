@@ -60,4 +60,14 @@ def pdf_preview(request):
         return HttpResponse("There was an error generating pdf or session expired",status=404)
 
 
+def pdf_download(request):
+    cache_key = f'pdf_{request.session.session_key}'
+    resume_bytes = cache.get(cache_key)
 
+    if resume_bytes:
+        resume_pdf_file = io.BytesIO(resume_bytes)
+        response = HttpResponse(resume_pdf_file, content_type="application/pdf")
+        response['Content-Disposition'] = f'attachment; filename="tailored_resume.pdf"'
+        return response
+    else:
+        return HttpResponse("There was an error generating pdf or session expired")
