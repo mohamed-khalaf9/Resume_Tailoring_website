@@ -20,6 +20,8 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
     # All { and } in the JSON schema MUST be escaped as {{ and }}
     # so the f-string doesn't interpret them as variables.
 
+
+
     prompt = textwrap.dedent(f"""
     You are an expert technical resume parser and career-coaching assistant. Your sole task is to:
     1.  Parse an unstructured resume and its associated hyperlink data.
@@ -55,31 +57,38 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
     1.  **Parse and Populate:** Read the `RESUME TEXT` and fill the JSON schema.
         * **`personal_info.accounts`:** Use the `HYPERLINK DATA` to find social/professional links. The `platform` should be the common name (e.g., "LinkedIn", "GitHub"). The `link` is the full URL.
         * **`projects.links`:** Use the `HYPERLINK DATA`. The `link` is the full URL. For the `description`, use the hyperlink's anchor text (e.g., "GitHub Repo", "Live Demo"). If no anchor text is available, use a logical default like "Source Code" or "Project Link".
-        * **`additional_sections.items.link`:** Use the `HYPERLINK DATA` if a relevant link is found for an item (e.g., a certificate).
         * **NEW RULE (Education):** Be granular and intelligent when parsing education.
+            * **University Name:** When extracting `university_name`, strip the word "University". For example, "Cairo University" must be extracted as "Cairo".
+            * **Degree Fields:**
             * **Example 1:** If text is "Bachelor of Science in Information Technology", you MUST set: `degree: "Bachelor"`, `faculty: "Science"`, `specialization: "Information Technology"`.
             * **Example 2:** If text is "Bachelor of Science", you MUST set: `degree: "Bachelor"`, `faculty: "Science"`.
             * **Example 3:** If text is "Bachelor, Computer Science", you MUST set: `degree: "Bachelor"`, `specialization: "Computer Science"`.
             * Always try to split the degree level (Bachelor, Master) from the faculty (Science, Arts, Engineering) and the specialization (Computer Science, Information Technology).
-        * **NEW RULE (Work Type):** For each item in `experience`, if the resume text mentions the nature of the employment, populate the `work_type` field. Examples include "Full-time", "Part-time", "Hybrid", "Remote", or "Internship". If not mentioned, leave it as an empty string.
+        * **NEW RULE (Work Type):** For each item in `experience`, meticulously scan the text for terms describing the nature of the employment. Populate the `work_type` field if you find terms like "Full-time", "Part-time", "Hybrid", "Remote", "Internship", "Contract", or "Freelance". If no such term is mentioned, leave it as an empty string.
 
     2.  **Tailor (No Hallucination):** Analyze the `JOB DESCRIPTION`. Identify key skills, technologies, and responsibilities.
-        * **CRITICAL:** You must *only* use information, skills, and experiences found in the original `RESUME TEXT`.
-        * **DO NOT** invent new facts, skills, or experiences, even if they are in the job description.
-        * Your goal is to *re-frame and emphasize* the candidate's existing qualifications that match the job. If the candidate lacks a skill from the job description, simply omit it.
+        * **CRITICAL (NO HALLUCINATION):** You must *only* use information, skills, and experiences found in the original `RESUME TEXT`.
+        * **DO NOT** invent new facts, skills, metrics, or experiences, even if they are in the job description. Your goal is to *re-frame and emphasize* the candidate's existing qualifications that match the job.
+        * **STRICT RULE:** If you identify a skill or keyword from the `JOB DESCRIPTION` that you want to add to the `skills` section, you MUST first verify that the candidate *explicitly mentioned* using that skill or technology in their `experience` or `projects` sections. Do not add a skill just because it's in the job description; it MUST be backed by evidence in the resume.
+        * If the candidate lacks a skill from the job description, simply omit it. Do not invent it.
 
-    3.  **Rewrite for Impact (If Possible):** For all `description` fields (in `experience`, `projects`, and `additional_sections`), review the bullet points.
+    3.  **Rewrite for Impact (If Possible):** For all `description` fields (in `experience` and `projects`), review the bullet points.
         * **If** the original bullet point provides a quantifiable result or clear impact (a metric, number, or clear outcome [Y]), **then** rewrite it to follow the "Accomplished [X] as measured by [Y] by doing [Z]" format.
         * **Example (if impact is present):** If the resume says "Wrote APIs that improved login speed by 20%", you should rewrite it as: "Improved login speed by 20% [Y] by developing new REST APIs [Z] for the user-auth module [X]."
         * **CRITICAL CAVEAT:** If the original bullet point is a simple responsibility (e.g., "Wrote APIs," "Managed databases") and **no impact or metric [Y] is mentioned**, **DO NOT INVENT ONE.** Simply transfer the cleaned-up responsibility (e.g., "Developed and maintained REST APIs for backend services.")
         * **NEW RULE (Be Intelligent):** Do not be a robot. If a bullet point is *already* well-written and clear, you do not need to forcibly rewrite it. Only apply the X-Y-Z format if it genuinely adds value *and* all parts (X, Y, Z) are present.
 
-    4.  **Skills Grouping:** In the `skills` section, intelligently group all skills from the resume. Create meaningful `group_name` values (e.g., "Backend", "AI/ML", "Cloud & DevOps", "Databases", "Languages"(like english arabic and so on)).
-        * **NEW RULE (Skill Tailoring):**
-            1.  **Extract:** Identify all skills from the `RESUME TEXT`. Extract both the specific technology (e.g., "trie-based autocomplete") and the general concept it implies (e.g., "Data Structures", "Algorithms").
-            2.  **Align & Report:** In the final `skills` JSON, prioritize listing the skills that are **both** supported by the resume and **explicitly mentioned** in the `JOB DESCRIPTION`. If the job description asks for "Data Structures," list that. If it *specifically* asks for "Trie algorithms," list that (since the resume provides evidence for it).
+    4.  **Skills Grouping and Tailoring:** In the `skills` section, intelligently group all skills.
+        * **Groups:** Create meaningful `group_name` values (e.g., "Backend", "AI/ML", "Cloud & DevOps", "Databases", "Languages").
+        * **Skill Sourcing:** The final list of skills in the JSON must adhere to this logic:
+            1.  First, extract all explicit skills from the `RESUME TEXT` (from skills sections, experience, projects, etc.).
+            2.  Second, identify all skills and technologies mentioned in the `JOB DESCRIPTION`.
+            3.  Third, only add a skill from the `JOB DESCRIPTION` to the final list if it is *also* explicitly supported and mentioned in the `RESUME TEXT` (e.g., in an experience or project description).
+            4.  The reference for any added skill *must* be the candidate's own experience and projects.
 
     5.  **Job Title:** Populate the `personal_info.job_required_title` field using the main job title found in the `JOB DESCRIPTION`. Do not use a title from the resume or guess a general one.
+
+    6.  **Discard Extra Sections:** The resume may contain sections like "Summary", "Objective", "Certifications", "Publications", or "Honors & Awards". These are **not** defined in the schema. You MUST discard all information from such sections. Do not attempt to fit them into the JSON.
 
     ---
     ### 3. OUTPUT FORMAT
@@ -158,25 +167,8 @@ def construct_prompt(resume_content: str, hyper_links: list, job_description: st
             "string | "" "
           ] | []
         }}
-      ] | [],
-      "additional_sections": [
-        {{
-          "section_title": "string | "" ",
-          "items": [
-            {{
-              "name": "string | "" ",
-              "start_date": "string | "" ",
-              "end_date": "string | "" ",
-              "link": "string | "" ",
-              "description": [
-                "string | "" "
-              ] | []
-            }}
-          ] | []
-        }}
       ] | []
-    }}
-    """)
+    }} """)
 
     return prompt
 
