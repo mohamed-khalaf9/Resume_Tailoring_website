@@ -56,7 +56,7 @@ class SkillGroup(BaseModel):
     skills: list[str]= Field(default_factory=list)
 
 
-class AdditionalSectionItem(BaseModel):
+'''class AdditionalSectionItem(BaseModel):
     name: str=""
     start_date: str=""
     end_date: str=""
@@ -66,7 +66,7 @@ class AdditionalSectionItem(BaseModel):
 
 class AdditionalSection(BaseModel):
     section_title: str=""
-    items: list[AdditionalSectionItem]= Field(default_factory=list)
+    items: list[AdditionalSectionItem]= Field(default_factory=list)'''
 
 
 
@@ -76,7 +76,7 @@ class ResumeContent(BaseModel):
     experience: list[ExperienceItem]=Field(default_factory=list)
     projects: list[ProjectItem]=Field(default_factory=list)
     skills: list[SkillGroup]=Field(default_factory=list)
-    additional_sections: list[AdditionalSection]=Field(default_factory=list)
+
 
 
 
