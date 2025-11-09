@@ -50,7 +50,7 @@ I will be actively working on making Resume Tailor more robust and feature-rich.
 
 ### AI & Core Logic Improvements
 - [ ] **Prompt Optimization:** Further refine LLM prompts to achieve even higher accuracy when tailoring content to job descriptions.
-- [S] **Robust Sanitization:** Implement advanced sanitization for all LLM responses to rigorously escape special characters, ensuring 100% reliable LaTeX compilation.
+- [ ] **Robust Sanitization:** Implement advanced sanitization for all LLM responses to rigorously escape special characters, ensuring 100% reliable LaTeX compilation.
 - [ ] **Enhanced Validation:** Comprehensive validation and error handling for all user inputs to improve application stability.
 
 ### Resume Template Enhancements
