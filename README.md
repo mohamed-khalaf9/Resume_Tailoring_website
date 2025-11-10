@@ -46,6 +46,9 @@ I will be actively working on making Resume Tailor more robust and feature-rich.
 ### Architecture & UI
 - [ ] **REST API Transition:** Refactor core functionalities into a well-designed, scalable REST API.
 - [ ] **Modern UI:** Develop a sleek, modern user interface to interact with the new API.
+- [ ] **Asynchronous Processing:** Implement asynchronous task handling.
+- [ ] **Rate Limiting:** Introduce API rate limiting to ensure stable service for all users.
+- [ ] **Subscription Tiers:** Add user accounts and subscription tiers for advanced features.
 - [ ] **UX Enhancements:** Introduction of three major upcoming features designed to significantly improve the user experience.
 
 ### AI & Core Logic Improvements
